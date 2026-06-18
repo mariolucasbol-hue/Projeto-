@@ -1,0 +1,130 @@
+{
+  "entities": {
+    "Personal": {
+      "title": "Personal",
+      "description": "Represents a personal trainer.",
+      "type": "object",
+      "properties": {
+        "nome": { "type": "string" },
+        "email": { "type": "string" },
+        "criadoEm": { "type": "number", "description": "timestamp" }
+      },
+      "required": ["email", "criadoEm"]
+    },
+    "Pergunta": {
+      "title": "Pergunta",
+      "description": "Form question defined by the personal trainer.",
+      "type": "object",
+      "properties": {
+        "texto": { "type": "string" },
+        "tipo": { "type": "string", "enum": ["texto", "numero", "selecao_unica", "selecao_multipla"] },
+        "opcoes": { "type": "array" },
+        "obrigatoria": { "type": "boolean" },
+        "ordem": { "type": "number" },
+        "criadaEm": { "type": "number", "description": "timestamp" }
+      },
+      "required": ["texto", "tipo", "obrigatoria", "ordem", "criadaEm"]
+    },
+    "Regra": {
+      "title": "Regra",
+      "description": "Match rule for a plan",
+      "type": "object",
+      "properties": {
+        "campo": { "type": "string" },
+        "operador": { "type": "string", "enum": ["igual", "diferente", "maior", "menor", "entre", "contem"] },
+        "valor": { "type": "string" },
+        "valorMin": { "type": "string" },
+        "valorMax": { "type": "string" }
+      },
+      "required": ["campo", "operador"]
+    },
+    "Plano": {
+      "title": "Plano",
+      "description": "Training plan PDF and its rules.",
+      "type": "object",
+      "properties": {
+        "nome": { "type": "string" },
+        "descricao": { "type": "string" },
+        "pdfUrl": { "type": "string" },
+        "pdfNome": { "type": "string" },
+        "prioridade": { "type": "number" },
+        "regras": {
+          "type": "array",
+          "items": { "$ref": "#/entities/Regra" }
+        },
+        "preco": { "type": "number" },
+        "gratuito": { "type": "boolean" },
+        "criadoEm": { "type": "number", "description": "timestamp" }
+      },
+      "required": ["nome", "prioridade", "regras", "gratuito", "criadoEm"]
+    },
+    "Aluno": {
+      "title": "Aluno",
+      "description": "Student who answered the form",
+      "type": "object",
+      "properties": {
+        "respostas": { "type": "object" },
+        "planoId": { "type": "string" },
+        "planoNome": { "type": "string" },
+        "criadoEm": { "type": "number", "description": "timestamp" }
+      },
+      "required": ["respostas", "criadoEm"]
+    },
+    "ConfigMercadoPago": {
+      "title": "ConfigMercadoPago",
+      "description": "Mercado Pago settings for the personal",
+      "type": "object",
+      "properties": {
+        "accessToken": { "type": "string" },
+        "urlBase": { "type": "string" },
+        "configuradoEm": { "type": "number", "description": "timestamp" }
+      },
+      "required": ["accessToken", "urlBase", "configuradoEm"]
+    },
+    "Pagamento": {
+      "title": "Pagamento",
+      "description": "Payment record for a plan.",
+      "type": "object",
+      "properties": {
+        "alunoId": { "type": "string" },
+        "alunoNome": { "type": "string" },
+        "alunoEmail": { "type": "string" },
+        "planoId": { "type": "string" },
+        "planoNome": { "type": "string" },
+        "valor": { "type": "number" },
+        "status": { "type": "string" },
+        "paymentIdMP": { "type": "string" },
+        "externalReference": { "type": "string" },
+        "criadoEm": { "type": "number", "description": "timestamp" },
+        "aprovadoEm": { "type": "number", "description": "timestamp" }
+      },
+      "required": ["alunoId", "planoId", "valor", "status", "criadoEm"]
+    }
+  },
+  "firestore": {
+    "/personais/{personalId}": {
+      "schema": "#/entities/Personal",
+      "description": "Stores personal profiles."
+    },
+    "/personais/{personalId}/perguntas/{perguntaId}": {
+      "schema": "#/entities/Pergunta",
+      "description": "Stores form questions."
+    },
+    "/personais/{personalId}/planos/{planoId}": {
+      "schema": "#/entities/Plano",
+      "description": "Stores training plans."
+    },
+    "/personais/{personalId}/alunos/{alunoId}": {
+      "schema": "#/entities/Aluno",
+      "description": "Stores student responses."
+    },
+    "/personais/{personalId}/config/{configId}": {
+      "schema": "#/entities/ConfigMercadoPago",
+      "description": "Stores generic configuration (mostly mercadopago)."
+    },
+    "/personais/{personalId}/pagamentos/{pagamentoId}": {
+      "schema": "#/entities/Pagamento",
+      "description": "Stores payment records."
+    }
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "FitPlan",
+  "description": "Plataforma moderna de treinos para Personal Trainers e seus Alunos com suporte PWA.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,45 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    function isSignedIn() { return request.auth != null; }
+    function isPersonal(personalId) { return isSignedIn() && request.auth.uid == personalId; }
+    
+    // Global Deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    match /personais/{personalId} {
+      // Create is somewhat implicit when a new user signs up, but for now allow if it's the personal.
+      allow read, write: if isPersonal(personalId);
+      
+      match /perguntas/{perguntaId} {
+        // Alunos need to read these
+        allow read: if true;
+        allow write: if isPersonal(personalId);
+      }
+      
+      match /planos/{planoId} {
+        // Alunos evaluate plans, but we don't want them reading full plans directly if we can avoid it.
+        // Wait, the client-side logic requires them to fetch plans and run match logic! 
+        allow read: if true;
+        allow write: if isPersonal(personalId);
+      }
+      
+      match /alunos/{alunoId} {
+        allow read, write: if true; // MVP: allow full client access to check duplicates
+      }
+      
+      match /pagamentos/{pagamentoId} {
+        allow create: if true; // Client creates pending payment intent or webhook sets it.
+        allow read, update, delete: if isPersonal(personalId);
+      }
+      
+      match /config/{configId} {
+        allow read: if true; // ALERTA MVP: Access token fica visivel. Em producao, deve-se usar backend.
+        allow write: if isPersonal(personalId);
+      }
+    }
+  }
+}
